@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatter Plot with Axes</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .dot {
+            fill: steelblue;
+            stroke: black;
+        }
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <svg width="600" height="200"></svg>
+    <script>
+        const svg = d3.select("svg");
+        const margin = {top: 10, right: 20, bottom: 30, left: 40};
+        const width = +svg.attr("width") - margin.left - margin.right;
+        const height = +svg.attr("height") - margin.top - margin.bottom;
+
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const xScale = d3.scaleLinear()
+                         .domain([10, 50])
+                         .range([0, width]);
+        const yScale = d3.scaleSqrt()
+                         .domain([100, 500])
+                         .range([height, 0]);
+
+        const xAxis = d3.axisBottom(xScale).ticks(5);
+        const yAxis = d3.axisLeft(yScale).ticks(5);
+
+        g.append("g")
+         .attr("transform", `translate(0,${height})`)
+         .attr("class", "axis")
+         .call(xAxis);
+
+        g.append("g")
+         .attr("class", "axis")
+         .call(yAxis);
+
+        const data = [
+            {x: 10, y: 100},
+            {x: 20, y: 200},
+            {x: 30, y: 300},
+            {x: 40, y: 400},
+            {x: 50, y: 500}
+        ];
+
+        g.selectAll("circle")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => xScale(d.x))
+            .attr("cy", d => yScale(d.y))
+            .attr("r", 5);
+    </script>
+</body>
+</html>

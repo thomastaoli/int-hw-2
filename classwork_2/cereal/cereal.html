@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Visualization</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="tooltip" class="hidden">
+      <p><strong>Important Label Heading</strong></p>
+      <p><span id="value">100</span>%</p>
+    </div>
+    <svg id="my_dataviz" width="800" height="800"></svg>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <svg width="800" height="800">
+      <div id="tooltip" class="hidden">
+        <p><strong>Important Label Heading</strong></p>
+        <p>
+          <span id="value">100</span>
+          %
+        </p>
+      </div>
+    </svg>
+  </body>
+
+  <script>
+    // Set the dimensions and margins of the graph
+    var margin = { top: 30, right: 30, bottom: 30, left: 50 },
+      width = 800 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom;
+
+    // Append the svg object to the body of the page
+    var svg = d3
+      .select("#my_dataviz")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Load and process the data
+    d3.csv("cereal.csv")
+      .then(function (data) {
+        // Convert string to number for sugars and fat
+        data.forEach(function (d) {
+          d.sugars = +d.sugars;
+          d.fat = +d.fat;
+        });
+
+        var x = d3.scaleLinear().domain([0, 15]).range([0, width]);
+        var y = d3
+          .scaleLinear()
+          .domain([0, d3.max(data, (d) => Math.max(d.sugars, d.fat))])
+          .range([height, 0]);
+
+        svg
+          .append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+        svg.append("g").call(d3.axisLeft(y));
+
+        var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(60));
+        var densitySugars = kde(data.map((d) => d.sugars));
+        var densityFat = kde(data.map((d) => d.fat));
+
+        // Plot the areas
+        plotArea(densitySugars, "#69b3a2");
+        plotArea(densityFat, "#404080");
+
+        function plotArea(density, fill) {
+          svg
+            .append("path")
+            .datum(density)
+            .attr("fill", fill)
+            .attr("opacity", "0.6")
+            .attr("stroke", "#000")
+            .attr("stroke-width", 1)
+            .attr("stroke-linejoin", "round")
+            .attr(
+              "d",
+              d3
+                .line()
+                .curve(d3.curveBasis)
+                .x((d) => x(d[0]))
+                .y((d) => y(d[1]))
+            );
+        }
+      })
+      .catch(function (error) {
+        console.error("Error loading or processing data:", error);
+      });
+
+    // Kernel density estimator functions
+    function kernelDensityEstimator(kernel, X) {
+      return function (V) {
+        return X.map(function (x) {
+          return [
+            x,
+            d3.mean(V, function (v) {
+              return kernel(x - v);
+            }),
+          ];
+        });
+      };
+    }
+
+    function kernelEpanechnikov(k) {
+      return function (v) {
+        return Math.abs((v /= k)) <= 1 ? (0.75 * (1 - v * v)) / k : 0;
+      };
+    }
+  </script>
+</html>

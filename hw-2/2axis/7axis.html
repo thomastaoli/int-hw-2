@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D3 Axis</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <svg width="800" height="400"></svg>
+  <script>
+  </script>
+</body>
+
+
+<script>
+    // Time Scale: Create the y-axis inside an SVG element. 
+    // Set the scale to scaleTime and label the ticks with times of the day, 
+    // e.g., [12:00 AM, 06:00 AM, 12:00 PM, 06:00 PM].
+    const svg = d3.select('svg');
+    const height = +svg.attr('height');
+    const width = +svg.attr('width');
+    const margin = { top: 40, right: 40, bottom: 40, left: 40 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+    const yScale = d3.scaleTime()
+      .domain([new Date(2021, 0, 1, 0), new Date(2021, 0, 1, 23)])
+      .range([0, innerHeight]);
+    const yAxis = d3.axisLeft(yScale)
+      .tickFormat(d3.timeFormat('%I %p'));
+    g.call(yAxis);
+    
+</script>
+</html>

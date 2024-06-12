@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="./styles.css"></link>
+        <title>My Updating Chart</title>
+    </head>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+    <body>
+        <svg height="200" width="500" id="svg"></svg>
+    </body>
+
+    <script>
+        const rectColors = [
+            "yellowgreen",
+            "cornflowerblue",
+            "seagreen",
+            "slateblue",
+        ]
+
+        // create and bind data to our rects
+        const rects = d3.select("#svg")
+            .selectAll(".rect")
+            .data(rectColors)
+            .join("rect")
+            .attr("height", 100)
+            .attr("width", 100)
+            .attr("x", (d,i) => i * 110)
+            .attr("fill", "lightgrey")
+            .on("mouseover", handleMouseOver)
+
+        //create a function called handleMouseOver that shows the data bound to the rect/square
+        //like a tooltip and have the tooltip disappear when the mouse leaves the rect/square
+
+        function handleMouseOver(event, d) {
+            const tooltip = d3.select("body")
+                .append("div")
+                .style("position", "absolute")
+                .style("background-color", "lightgrey")
+                .style("padding", "5px")
+                .style("border", "1px solid black")
+                .style("border-radius", "5px")
+                .style("pointer-events", "none")
+                .text(d)
+
+            tooltip.style("top", event.clientY + 10 + "px")
+            tooltip.style("left", event.clientX + 10 + "px")
+
+            d3.select(this)
+                .attr("fill", d)
+                .attr("stroke", "black")
+                .attr("stroke-width", 2)
+        }
+
+        rects.on("mouseout", function() {
+            d3.select(this)
+                .attr("fill", "lightgrey")
+                .attr("stroke", "none")
+            d3.select("body")
+                .select("div")
+                .remove()
+        })
+
+    </script>
+</html>

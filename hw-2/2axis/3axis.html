@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D3 Axis</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <svg width="600" height="200"></svg>
+  <script>
+  </script>
+</body>
+
+<script>
+    // Custom Tick Formatting: Create the x-axis inside an SVG element. 
+    // Set the scale to scaleLinear and label the ticks with formatted values as percentages, e.g., "25%", "50%", "75%".
+    const data = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+    const svg = d3.select('svg');
+    const width = +svg.attr('width');
+    const height = +svg.attr('height');
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const xScale = d3.scaleLinear()
+      .domain([0, d3.max(data)])
+      .range([0, innerWidth]);
+    const xAxis = d3.axisBottom(xScale)
+      .tickFormat(d => d + '%');
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+    g.append('g').call(xAxis)
+      .attr('transform', `translate(0,${innerHeight})`);
+
+</script>
+</html>
